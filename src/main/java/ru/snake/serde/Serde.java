@@ -21,6 +21,7 @@ import ru.snake.serde.serializer.array.DoubleArraySerailizer;
 import ru.snake.serde.serializer.array.FloatArraySerailizer;
 import ru.snake.serde.serializer.array.IntegerArraySerailizer;
 import ru.snake.serde.serializer.array.LongArraySerailizer;
+import ru.snake.serde.serializer.array.ObjectArraySerailizer;
 import ru.snake.serde.serializer.array.ShortArraySerailizer;
 import ru.snake.serde.serializer.exception.SerdeDuplicateClassException;
 import ru.snake.serde.serializer.exception.SerdeException;
@@ -50,7 +51,7 @@ public class Serde {
 
 	@SafeVarargs
 	private <T> void registerSerializer(final Serialiser<T> serializer, final Class<T>... classes)
-			throws SerdeDuplicateClassException {
+			throws SerdeException {
 		typeRegistry.register(classes);
 
 		for (Class<T> clazz : classes) {
@@ -58,7 +59,7 @@ public class Serde {
 		}
 	}
 
-	public void registerDefault() throws SerdeDuplicateClassException {
+	public void registerDefault() throws SerdeException {
 		// Trivial types.
 		registerSerializer(new ByteSerailizer(), byte.class, Byte.class);
 		registerSerializer(new ShortSerailizer(), short.class, Short.class);
@@ -87,6 +88,7 @@ public class Serde {
 		registerSerializer(new DoubleArraySerailizer(), double[].class);
 		registerSerializer(new BooleanArraySerailizer(), boolean[].class);
 		registerSerializer(new CharacterArraySerailizer(), char[].class);
+		registerSerializer(new ObjectArraySerailizer(), Object[].class);
 	}
 
 	public <T> void register(final Class<T> clazz) throws SerdeReflectiveException, SerdeDuplicateClassException {
@@ -94,8 +96,7 @@ public class Serde {
 		serializerRegistry.register(clazz);
 	}
 
-	public <T> void register(final Class<T> clazz, final Serialiser<T> serialiser)
-			throws SerdeReflectiveException, SerdeDuplicateClassException {
+	public <T> void register(final Class<T> clazz, final Serialiser<T> serialiser) throws SerdeException {
 		typeRegistry.register(clazz);
 		serializerRegistry.register(clazz, serialiser);
 	}
@@ -103,49 +104,20 @@ public class Serde {
 	public <T> byte[] serialize(final T object) throws IOException, SerdeException {
 		try (ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 				DataOutputStream stream = new DataOutputStream(buffer)) {
-			serialize(stream, object);
+			SerdeContext context = new SerdeContext(typeRegistry, serializerRegistry);
+			context.serialize(stream, object);
 
 			return buffer.toByteArray();
-		}
-	}
-
-	public <T> void serialize(final DataOutputStream stream, final T object) throws IOException, SerdeException {
-		if (object == null) {
-			int id = typeRegistry.getNullId();
-
-			stream.writeInt(id);
-		} else {
-			@SuppressWarnings("unchecked")
-			Class<T> clazz = (Class<T>) object.getClass();
-			int id = typeRegistry.getId(clazz);
-			Serialiser<T> serializer = serializerRegistry.getSerializer(clazz);
-			SerdeContext context = new SerdeContext(this);
-
-			stream.writeInt(id);
-			serializer.serialize(context, stream, object);
 		}
 	}
 
 	public <T> T deserialize(final byte[] bytes) throws IOException, SerdeException {
 		try (ByteArrayInputStream buffer = new ByteArrayInputStream(bytes);
 				DataInputStream stream = new DataInputStream(buffer)) {
-			return deserialize(stream);
+			SerdeContext context = new SerdeContext(typeRegistry, serializerRegistry);
+
+			return context.deserialize(stream);
 		}
-	}
-
-	public <T> T deserialize(final DataInputStream stream) throws IOException, SerdeException {
-		int id = stream.readInt();
-
-		if (id == typeRegistry.getNullId()) {
-			return null;
-		}
-
-		Class<T> clazz = typeRegistry.getClass(id);
-		Serialiser<T> serializer = serializerRegistry.getSerializer(clazz);
-		SerdeContext context = new SerdeContext(this);
-		T result = serializer.deserialize(context, stream);
-
-		return result;
 	}
 
 	@Override

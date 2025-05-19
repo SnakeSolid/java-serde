@@ -1,0 +1,46 @@
+package ru.snake.serde.serializer.array;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Array;
+
+import ru.snake.serde.serializer.SerdeContext;
+import ru.snake.serde.serializer.Serialiser;
+import ru.snake.serde.serializer.exception.SerdeException;
+
+public class ObjectArraySerailizer extends Serialiser<Object[]> {
+
+	@Override
+	public void serialize(final SerdeContext context, final DataOutputStream stream, final Object[] array)
+			throws IOException, SerdeException {
+		Class<?> arrayClass = array.getClass().getComponentType();
+		context.serializeType(stream, arrayClass);
+
+		stream.writeInt(array.length);
+
+		for (Object item : array) {
+			context.serialize(stream, item);
+		}
+	}
+
+	@Override
+	public Object[] deserialize(final SerdeContext context, final DataInputStream stream)
+			throws IOException, SerdeException {
+		Class<?> clazz = context.deserializeType(stream);
+		int length = stream.readInt();
+		Object[] result = (Object[]) Array.newInstance(clazz, length);
+
+		for (int index = 0; index < length; index += 1) {
+			result[index] = stream.readInt();
+		}
+
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "ObjectArraySerailizer []";
+	}
+
+}

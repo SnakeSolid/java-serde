@@ -6,6 +6,7 @@ import java.util.Map;
 import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.exception.SerdeNoSerializerException;
 import ru.snake.serde.serializer.exception.SerdeReflectiveException;
+import ru.snake.serde.serializer.exception.SerdeUnrealClassException;
 
 public class SerializerRegistry {
 
@@ -34,7 +35,13 @@ public class SerializerRegistry {
 		serializers.put(clazz, serialiser);
 	}
 
-	public <T> void register(final Class<T> clazz, final Serialiser<T> serialiser) {
+	public <T> void register(final Class<T> clazz, final Serialiser<T> serialiser) throws SerdeUnrealClassException {
+		if (clazz.isInterface()) {
+			throw new SerdeUnrealClassException(
+				String.format("Try to register interface %s.", clazz.getCanonicalName())
+			);
+		}
+
 		serializers.put(clazz, serialiser);
 	}
 
