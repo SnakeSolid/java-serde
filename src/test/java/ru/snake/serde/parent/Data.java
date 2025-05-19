@@ -1,4 +1,4 @@
-package ru.snake.serde;
+package ru.snake.serde.parent;
 
 import java.util.Arrays;
 

@@ -5,6 +5,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import ru.snake.serde.serializer.SerdeContext;
 import ru.snake.serde.serializer.Serialiser;
@@ -19,6 +25,8 @@ import ru.snake.serde.serializer.array.ShortArraySerailizer;
 import ru.snake.serde.serializer.exception.SerdeDuplicateClassException;
 import ru.snake.serde.serializer.exception.SerdeException;
 import ru.snake.serde.serializer.exception.SerdeReflectiveException;
+import ru.snake.serde.serializer.object.CollectionSerailizer;
+import ru.snake.serde.serializer.object.MapSerailizer;
 import ru.snake.serde.serializer.object.StringSerailizer;
 import ru.snake.serde.serializer.primitive.BooleanSerailizer;
 import ru.snake.serde.serializer.primitive.ByteSerailizer;
@@ -63,12 +71,12 @@ public class Serde {
 
 		// Basic types.
 		registerSerializer(new StringSerailizer(), String.class);
-		// registerSerializer(new ListSerailizer(), ArrayList.class,
-		// LinkedList.class);
-		// registerSerializer(new SetSerailizer(), HashSet.class);
-		// registerSerializer(new SortedSetSerailizer(), SortedSet.class);
-		// registerSerializer(new MapSerailizer(), HashMap.class);
-		// registerSerializer(new SortedMapSerailizer(), TreeMap.class);
+		registerSerializer(new CollectionSerailizer<>(ArrayList::new), ArrayList.class);
+		registerSerializer(new CollectionSerailizer<>(LinkedList::new), LinkedList.class);
+		registerSerializer(new CollectionSerailizer<>(HashSet::new), HashSet.class);
+		registerSerializer(new CollectionSerailizer<>(TreeSet::new), TreeSet.class);
+		registerSerializer(new MapSerailizer<>(HashMap::new), HashMap.class);
+		registerSerializer(new MapSerailizer<>(TreeMap::new), TreeMap.class);
 
 		// Array types.
 		registerSerializer(new ByteArraySerailizer(), byte[].class);
