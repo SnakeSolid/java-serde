@@ -9,6 +9,9 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import ru.snake.serde.enums.DataTag;
+import ru.snake.serde.enums.DataType;
+
 public class SerdeTest {
 
 	@Test
@@ -67,6 +70,23 @@ public class SerdeTest {
 		Assertions.assertArrayEquals(source.getKeys(), target.getKeys());
 		Assertions.assertArrayEquals(source.getInner(), target.getInner());
 		Assertions.assertArrayEquals(source.getOuter(), target.getOuter());
+	}
+
+	@Test
+	public void mustSerializeEnums() throws Throwable {
+		Serde serde = new Serde();
+		serde.registerDefault();
+		serde.register(ru.snake.serde.enums.Data.class, true);
+
+		ru.snake.serde.enums.Data source = new ru.snake.serde.enums.Data(
+			DataType.TypeTwo,
+			new DataTag[] { DataTag.Right, DataTag.Middle }
+		);
+		byte[] bytes = serde.serialize(source);
+		ru.snake.serde.enums.Data target = serde.deserialize(bytes);
+
+		Assertions.assertEquals(source.getType(), target.getType());
+		Assertions.assertArrayEquals(source.getTags(), target.getTags());
 	}
 
 	@Test
