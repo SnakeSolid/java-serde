@@ -57,7 +57,8 @@ public class SerdeTest {
 		ru.snake.serde.array.Data source = new ru.snake.serde.array.Data(
 			new long[] { 100, 200, 300 },
 			new String[] { "index", "name" },
-			new List[] { list("a", "b"), list("cc", "dd") }
+			new List[] { list("a", "b"), list("cc", "dd") },
+			new List[] { list("eee"), list("fff") }
 		);
 		byte[] bytes = serde.serialize(source);
 		ru.snake.serde.array.Data target = serde.deserialize(bytes);
@@ -65,6 +66,7 @@ public class SerdeTest {
 		Assertions.assertArrayEquals(source.getIds(), target.getIds());
 		Assertions.assertArrayEquals(source.getKeys(), target.getKeys());
 		Assertions.assertArrayEquals(source.getInner(), target.getInner());
+		Assertions.assertArrayEquals(source.getOuter(), target.getOuter());
 	}
 
 	@SafeVarargs

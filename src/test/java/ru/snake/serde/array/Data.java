@@ -11,16 +11,20 @@ public class Data {
 
 	private final List<String>[] inner;
 
+	private final List<String>[] outer;
+
 	public Data() {
 		this.ids = null;
 		this.keys = null;
 		this.inner = null;
+		this.outer = null;
 	}
 
-	public Data(final long[] ids, final String[] keys, final List<String>[] inner) {
+	public Data(final long[] ids, final String[] keys, final List<String>[] inner, final List<String>[] outer) {
 		this.ids = ids;
 		this.keys = keys;
 		this.inner = inner;
+		this.outer = outer;
 	}
 
 	public long[] getIds() {
@@ -35,10 +39,14 @@ public class Data {
 		return inner;
 	}
 
+	public List<String>[] getOuter() {
+		return outer;
+	}
+
 	@Override
 	public String toString() {
 		return "Data [ids=" + Arrays.toString(ids) + ", keys=" + Arrays.toString(keys) + ", inner="
-				+ Arrays.toString(inner) + "]";
+				+ Arrays.toString(inner) + ", outer=" + Arrays.toString(outer) + "]";
 	}
 
 }

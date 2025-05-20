@@ -30,7 +30,23 @@ public class TypeRegistry {
 		return classToId.containsKey(clazz);
 	}
 
-	public int register(final Class<?>... classes) throws SerdeDuplicateClassException {
+	public int registerOne(final Class<?> clazz) throws SerdeDuplicateClassException {
+		Integer result = classToId.get(clazz);
+
+		if (result == null) {
+			Integer id = nextId;
+			nextId += 1;
+
+			classToId.put(clazz, id);
+			idToClass.put(id, clazz);
+
+			return id;
+		}
+
+		return result;
+	}
+
+	public int registerAll(final Class<?>... classes) throws SerdeDuplicateClassException {
 		Integer id = nextId;
 		nextId += 1;
 

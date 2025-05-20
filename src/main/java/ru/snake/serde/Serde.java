@@ -57,7 +57,7 @@ public class Serde {
 	@SafeVarargs
 	private <T> void registerSerializer(final Serialiser<T> serializer, final Class<T>... classes)
 			throws SerdeException {
-		typeRegistry.register(classes);
+		typeRegistry.registerAll(classes);
 
 		for (Class<T> clazz : classes) {
 			serializerRegistry.register(clazz, serializer);
@@ -99,12 +99,12 @@ public class Serde {
 	public <T> void register(final Class<T> clazz) throws SerdeException {
 		Serialiser<T> serialiser = Serialiser.builder(clazz).build();
 
-		typeRegistry.register(clazz);
+		typeRegistry.registerAll(clazz);
 		serializerRegistry.register(clazz, serialiser);
 	}
 
 	public <T> void register(final Class<T> clazz, final Serialiser<T> serialiser) throws SerdeException {
-		typeRegistry.register(clazz);
+		typeRegistry.registerAll(clazz);
 		serializerRegistry.register(clazz, serialiser);
 	}
 
@@ -137,7 +137,7 @@ public class Serde {
 				// We have to register all field types before serialization.
 				// Type can be array of interfaces of abstract classes.
 				if (!typeRegistry.contains(current)) {
-					typeRegistry.register(current);
+					typeRegistry.registerOne(current);
 				}
 
 				continue;
@@ -148,7 +148,9 @@ public class Serde {
 			} else if (current.isArray()) {
 				Class<Object[]> arrayClass = cast(current);
 				Class<Object> componentClass = cast(arrayClass.getComponentType());
-				register(arrayClass, new ObjectArraySerailizer());
+
+				typeRegistry.registerOne(arrayClass);
+				serializerRegistry.register(arrayClass, new ObjectArraySerailizer());
 
 				if (!serializerRegistry.contains(componentClass)) {
 					deque.addLast(componentClass);
@@ -160,7 +162,10 @@ public class Serde {
 					}
 				}
 			} else {
-				register(clazz);
+				Serialiser<Object> serialiser = Serialiser.builder(current).build();
+
+				typeRegistry.registerOne(current);
+				serializerRegistry.register(current, serialiser);
 
 				for (Class<Object> next : collectFieldClasses(current)) {
 					if (!serializerRegistry.contains(next)) {
