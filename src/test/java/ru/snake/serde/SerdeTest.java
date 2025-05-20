@@ -1,10 +1,16 @@
 package ru.snake.serde;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -83,6 +89,34 @@ public class SerdeTest {
 	}
 
 	@Test
+	public void mustSerilizeToStream() throws Throwable {
+		Serde serde = new Serde();
+		serde.registerDefault();
+		serde.register(ru.snake.serde.stream.Data.class, true);
+
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		ru.snake.serde.stream.Data sourceA = new ru.snake.serde.stream.Data(false, (short) 5, set("a", "b"));
+		ru.snake.serde.stream.Data sourceB = new ru.snake.serde.stream.Data(true, (short) 42, set("c", "d"));
+
+		try (DataOutputStream stream = new DataOutputStream(output)) {
+			serde.serialize(stream, sourceA);
+			serde.serialize(stream, sourceB);
+		}
+
+		ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
+		ru.snake.serde.stream.Data targetA;
+		ru.snake.serde.stream.Data targetB;
+
+		try (DataInputStream stream = new DataInputStream(input)) {
+			targetA = serde.deserialize(stream);
+			targetB = serde.deserialize(stream);
+		}
+
+		Assertions.assertEquals(sourceA, targetA);
+		Assertions.assertEquals(sourceB, targetB);
+	}
+
+	@Test
 	public void mustRegisterManyClasses() throws Throwable {
 		Serde serde = new Serde();
 		serde.registerDefault();
@@ -90,6 +124,12 @@ public class SerdeTest {
 		serde.register(ru.snake.serde.collection.Data.class, true);
 		serde.register(ru.snake.serde.enums.Data.class, true);
 		serde.register(ru.snake.serde.parent.Data.class, true);
+		serde.register(ru.snake.serde.stream.Data.class, true);
+	}
+
+	@SafeVarargs
+	private <T> Set<T> set(final T... items) {
+		return new HashSet<>(Arrays.asList(items));
 	}
 
 	@SafeVarargs

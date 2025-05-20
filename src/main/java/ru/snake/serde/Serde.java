@@ -214,6 +214,11 @@ public class Serde {
 		}
 	}
 
+	public <T> void serialize(final DataOutputStream stream, final T object) throws IOException, SerdeException {
+		SerdeContext context = new SerdeContext(typeRegistry, serializerRegistry);
+		context.serialize(stream, object);
+	}
+
 	public <T> T deserialize(final byte[] bytes) throws IOException, SerdeException {
 		try (ByteArrayInputStream buffer = new ByteArrayInputStream(bytes);
 				DataInputStream stream = new DataInputStream(buffer)) {
@@ -223,9 +228,15 @@ public class Serde {
 		}
 	}
 
+	public <T> T deserialize(final DataInputStream stream) throws IOException, SerdeException {
+		SerdeContext context = new SerdeContext(typeRegistry, serializerRegistry);
+
+		return context.deserialize(stream);
+	}
+
 	@Override
 	public String toString() {
-		return "Serde [typeRegistry=" + typeRegistry + "]";
+		return "Serde [typeRegistry=" + typeRegistry + ", serializerRegistry=" + serializerRegistry + "]";
 	}
 
 }
