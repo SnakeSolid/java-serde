@@ -51,7 +51,7 @@ public class SerdeTest {
 	public void mustSerializeObjectArrays() throws Throwable {
 		Serde serde = new Serde();
 		serde.registerDefault();
-		serde.register(ru.snake.serde.array.Data.class);
+		serde.register(ru.snake.serde.array.Data.class, true);
 
 		@SuppressWarnings("unchecked")
 		ru.snake.serde.array.Data source = new ru.snake.serde.array.Data(
@@ -62,9 +62,9 @@ public class SerdeTest {
 		byte[] bytes = serde.serialize(source);
 		ru.snake.serde.array.Data target = serde.deserialize(bytes);
 
-		Assertions.assertEquals(source.getIds(), target.getIds());
-		Assertions.assertEquals(source.getKeys(), target.getKeys());
-		Assertions.assertEquals(source.getInner(), target.getInner());
+		Assertions.assertArrayEquals(source.getIds(), target.getIds());
+		Assertions.assertArrayEquals(source.getKeys(), target.getKeys());
+		Assertions.assertArrayEquals(source.getInner(), target.getInner());
 	}
 
 	@SafeVarargs

@@ -26,6 +26,10 @@ public class TypeRegistry {
 		this.nextId = ID_START;
 	}
 
+	public boolean contains(final Class<?> clazz) throws SerdeDuplicateClassException {
+		return classToId.containsKey(clazz);
+	}
+
 	public int register(final Class<?>... classes) throws SerdeDuplicateClassException {
 		Integer id = nextId;
 		nextId += 1;
@@ -56,7 +60,7 @@ public class TypeRegistry {
 		Integer id = classToId.get(clazz);
 
 		if (id == null) {
-			throw new SerdeNoSuchClassException(String.format("Class for id %d not found in registry.", id));
+			throw new SerdeNoSuchClassException(String.format("Class for id %s not found in registry.", clazz));
 		}
 
 		return id;

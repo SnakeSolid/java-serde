@@ -32,7 +32,9 @@ public class ObjectArraySerailizer extends Serialiser<Object[]> {
 		Object[] result = (Object[]) Array.newInstance(clazz, length);
 
 		for (int index = 0; index < length; index += 1) {
-			result[index] = stream.readInt();
+			Object item = context.deserialize(stream);
+
+			result[index] = item;
 		}
 
 		return result;

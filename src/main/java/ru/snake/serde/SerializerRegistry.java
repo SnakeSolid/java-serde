@@ -5,7 +5,6 @@ import java.util.Map;
 
 import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.exception.SerdeNoSerializerException;
-import ru.snake.serde.serializer.exception.SerdeReflectiveException;
 import ru.snake.serde.serializer.exception.SerdeUnrealClassException;
 
 public class SerializerRegistry {
@@ -14,6 +13,10 @@ public class SerializerRegistry {
 
 	private SerializerRegistry() {
 		this.serializers = new HashMap<>();
+	}
+
+	public <T> boolean contains(final Class<T> clazz) throws SerdeUnrealClassException {
+		return serializers.containsKey(clazz);
 	}
 
 	public <T> Serialiser<T> getSerializer(Class<T> clazz) throws SerdeNoSerializerException {
@@ -27,12 +30,6 @@ public class SerializerRegistry {
 		}
 
 		return serialiser;
-	}
-
-	public <T> void register(final Class<T> clazz) throws SerdeReflectiveException {
-		Serialiser<T> serialiser = Serialiser.builder(clazz).build();
-
-		serializers.put(clazz, serialiser);
 	}
 
 	public <T> void register(final Class<T> clazz, final Serialiser<T> serialiser) throws SerdeUnrealClassException {
