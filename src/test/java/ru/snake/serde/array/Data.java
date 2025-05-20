@@ -44,6 +44,32 @@ public class Data {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(ids);
+		result = prime * result + Arrays.hashCode(inner);
+		result = prime * result + Arrays.hashCode(keys);
+		result = prime * result + Arrays.hashCode(outer);
+
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		} else if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+
+		Data other = (Data) obj;
+
+		return Arrays.equals(ids, other.ids) && Arrays.equals(inner, other.inner) && Arrays.equals(keys, other.keys)
+				&& Arrays.equals(outer, other.outer);
+	}
+
+	@Override
 	public String toString() {
 		return "Data [ids=" + Arrays.toString(ids) + ", keys=" + Arrays.toString(keys) + ", inner="
 				+ Arrays.toString(inner) + ", outer=" + Arrays.toString(outer) + "]";

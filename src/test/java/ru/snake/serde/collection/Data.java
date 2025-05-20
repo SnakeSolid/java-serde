@@ -2,6 +2,7 @@ package ru.snake.serde.collection;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Data {
 
@@ -25,6 +26,24 @@ public class Data {
 
 	public Map<Integer, Float> getMap() {
 		return map;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(keys, map);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		} else if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+
+		Data other = (Data) obj;
+
+		return Objects.equals(keys, other.keys) && Objects.equals(map, other.map);
 	}
 
 	@Override

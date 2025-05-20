@@ -28,9 +28,7 @@ public class SerdeTest {
 		byte[] bytes = serde.serialize(source);
 		ru.snake.serde.parent.Data target = serde.deserialize(bytes);
 
-		Assertions.assertArrayEquals(source.getKeys(), target.getKeys());
-		Assertions.assertEquals(source.getValue(), target.getValue());
-		Assertions.assertEquals(source.getId(), target.getId());
+		Assertions.assertEquals(source, target);
 	}
 
 	@Test
@@ -46,8 +44,7 @@ public class SerdeTest {
 		byte[] bytes = serde.serialize(source);
 		ru.snake.serde.collection.Data target = serde.deserialize(bytes);
 
-		Assertions.assertEquals(source.getKeys(), target.getKeys());
-		Assertions.assertEquals(source.getMap(), target.getMap());
+		Assertions.assertEquals(source, target);
 	}
 
 	@Test
@@ -66,10 +63,7 @@ public class SerdeTest {
 		byte[] bytes = serde.serialize(source);
 		ru.snake.serde.array.Data target = serde.deserialize(bytes);
 
-		Assertions.assertArrayEquals(source.getIds(), target.getIds());
-		Assertions.assertArrayEquals(source.getKeys(), target.getKeys());
-		Assertions.assertArrayEquals(source.getInner(), target.getInner());
-		Assertions.assertArrayEquals(source.getOuter(), target.getOuter());
+		Assertions.assertEquals(source, target);
 	}
 
 	@Test
@@ -85,8 +79,7 @@ public class SerdeTest {
 		byte[] bytes = serde.serialize(source);
 		ru.snake.serde.enums.Data target = serde.deserialize(bytes);
 
-		Assertions.assertEquals(source.getType(), target.getType());
-		Assertions.assertArrayEquals(source.getTags(), target.getTags());
+		Assertions.assertEquals(source, target);
 	}
 
 	@Test
