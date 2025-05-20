@@ -1,4 +1,4 @@
-package ru.snake.serde;
+package ru.snake.serde.context;
 
 import java.util.HashMap;
 import java.util.Map;

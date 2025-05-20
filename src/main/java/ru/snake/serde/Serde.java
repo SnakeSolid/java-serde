@@ -18,7 +18,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import ru.snake.serde.serializer.SerdeContext;
+import ru.snake.serde.context.SerdeContext;
+import ru.snake.serde.context.SerializerRegistry;
+import ru.snake.serde.context.TypeRegistry;
 import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.array.BooleanArraySerailizer;
 import ru.snake.serde.serializer.array.ByteArraySerailizer;

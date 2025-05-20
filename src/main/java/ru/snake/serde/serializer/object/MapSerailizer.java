@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
-import ru.snake.serde.serializer.SerdeContext;
+import ru.snake.serde.context.SerdeContext;
 import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.exception.SerdeException;
 

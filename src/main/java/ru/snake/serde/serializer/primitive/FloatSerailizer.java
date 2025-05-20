@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import ru.snake.serde.serializer.SerdeContext;
+import ru.snake.serde.context.SerdeContext;
 import ru.snake.serde.serializer.Serialiser;
 
 public class FloatSerailizer extends Serialiser<Float> {

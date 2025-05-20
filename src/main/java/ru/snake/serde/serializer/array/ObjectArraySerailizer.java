@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
 
-import ru.snake.serde.serializer.SerdeContext;
+import ru.snake.serde.context.SerdeContext;
 import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.exception.SerdeException;
 

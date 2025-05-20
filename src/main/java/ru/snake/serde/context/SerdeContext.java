@@ -1,11 +1,10 @@
-package ru.snake.serde.serializer;
+package ru.snake.serde.context;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import ru.snake.serde.SerializerRegistry;
-import ru.snake.serde.TypeRegistry;
+import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.exception.SerdeException;
 
 public class SerdeContext {
@@ -17,6 +16,22 @@ public class SerdeContext {
 	public SerdeContext(final TypeRegistry typeRegistry, final SerializerRegistry serializerRegistry) {
 		this.typeRegistry = typeRegistry;
 		this.serializerRegistry = serializerRegistry;
+	}
+
+	public <T> void serializePrimitive(final DataOutputStream stream, final T object)
+			throws IOException, SerdeException {
+		@SuppressWarnings("unchecked")
+		Class<T> clazz = (Class<T>) object.getClass();
+		Serialiser<T> serializer = serializerRegistry.getSerializer(clazz);
+
+		serializer.serialize(this, stream, object);
+	}
+
+	public <T> T deserializePrimitive(DataInputStream stream, Class<T> clazz) throws IOException, SerdeException {
+		Serialiser<T> serializer = serializerRegistry.getSerializer(clazz);
+		T result = serializer.deserialize(this, stream);
+
+		return result;
 	}
 
 	public <T> void serialize(final DataOutputStream stream, final T object) throws IOException, SerdeException {

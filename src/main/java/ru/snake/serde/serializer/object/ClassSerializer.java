@@ -5,19 +5,19 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import ru.snake.serde.context.SerdeContext;
 import ru.snake.serde.serializer.SerdeConstructor;
-import ru.snake.serde.serializer.SerdeContext;
-import ru.snake.serde.serializer.SerdeProperty;
 import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.exception.SerdeException;
+import ru.snake.serde.serializer.property.ProterySerializer;
 
 public class ClassSerializer<T> extends Serialiser<T> {
 
 	private final SerdeConstructor<T> constructor;
 
-	private final List<SerdeProperty> properties;
+	private final List<ProterySerializer> properties;
 
-	public ClassSerializer(SerdeConstructor<T> constructor, List<SerdeProperty> properties) {
+	public ClassSerializer(SerdeConstructor<T> constructor, List<ProterySerializer> properties) {
 		this.constructor = constructor;
 		this.properties = properties;
 	}
@@ -25,8 +25,8 @@ public class ClassSerializer<T> extends Serialiser<T> {
 	@Override
 	public void serialize(final SerdeContext context, DataOutputStream stream, T object)
 			throws IOException, SerdeException {
-		for (SerdeProperty property : properties) {
-			context.serialize(stream, property.get(object));
+		for (ProterySerializer property : properties) {
+			property.serialize(context, stream, object);
 		}
 	}
 
@@ -34,8 +34,8 @@ public class ClassSerializer<T> extends Serialiser<T> {
 	public T deserialize(final SerdeContext context, DataInputStream stream) throws IOException, SerdeException {
 		T object = constructor.create();
 
-		for (SerdeProperty property : properties) {
-			property.set(object, context.deserialize(stream));
+		for (ProterySerializer property : properties) {
+			property.deserialize(context, stream, object);
 		}
 
 		return object;

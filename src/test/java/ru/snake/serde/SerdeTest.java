@@ -93,9 +93,10 @@ public class SerdeTest {
 	public void mustRegisterManyClasses() throws Throwable {
 		Serde serde = new Serde();
 		serde.registerDefault();
-		serde.register(ru.snake.serde.parent.Data.class, true);
-		serde.register(ru.snake.serde.collection.Data.class, true);
 		serde.register(ru.snake.serde.array.Data.class, true);
+		serde.register(ru.snake.serde.collection.Data.class, true);
+		serde.register(ru.snake.serde.enums.Data.class, true);
+		serde.register(ru.snake.serde.parent.Data.class, true);
 	}
 
 	@SafeVarargs

@@ -1,4 +1,4 @@
-package ru.snake.serde.serializer;
+package ru.snake.serde.serializer.object;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -7,28 +7,31 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.snake.serde.serializer.SerdeConstructor;
+import ru.snake.serde.serializer.SerdeProperty;
+import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.exception.SerdeReflectiveException;
-import ru.snake.serde.serializer.object.ClassSerializer;
+import ru.snake.serde.serializer.property.ProterySerializer;
 
-public class SerialiserBuilder<T> {
+public class ClassSerialiserBuilder<T> {
 
 	private final Class<T> clazz;
 
 	private SerdeConstructor<T> constructor;
 
-	public SerialiserBuilder(final Class<T> clazz) {
+	public ClassSerialiserBuilder(final Class<T> clazz) {
 		this.clazz = clazz;
 		this.constructor = null;
 	}
 
-	public SerialiserBuilder<T> constructor(final SerdeConstructor<T> constructor) {
+	public ClassSerialiserBuilder<T> constructor(final SerdeConstructor<T> constructor) {
 		this.constructor = constructor;
 
 		return this;
 	}
 
 	public Serialiser<T> build() throws SerdeReflectiveException {
-		List<SerdeProperty> properties = new ArrayList<>();
+		List<ProterySerializer> serializers = new ArrayList<>();
 		Class<?> current = clazz;
 
 		while (current != null) {
@@ -39,8 +42,9 @@ public class SerialiserBuilder<T> {
 					MethodHandle getter = MethodHandles.lookup().unreflectGetter(field);
 					MethodHandle setter = MethodHandles.lookup().unreflectSetter(field);
 					SerdeProperty property = new SerdeProperty(field.getName(), field.getType(), getter, setter);
+					ProterySerializer serializer = ProterySerializer.create(property);
 
-					properties.add(property);
+					serializers.add(serializer);
 				} catch (IllegalAccessException e) {
 					throw new SerdeReflectiveException(e);
 				}
@@ -63,7 +67,7 @@ public class SerialiserBuilder<T> {
 			serdeConstructor = constructor;
 		}
 
-		return new ClassSerializer<>(serdeConstructor, properties);
+		return new ClassSerializer<>(serdeConstructor, serializers);
 	}
 
 	@Override
