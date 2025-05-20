@@ -69,6 +69,15 @@ public class SerdeTest {
 		Assertions.assertArrayEquals(source.getOuter(), target.getOuter());
 	}
 
+	@Test
+	public void mustRegisterManyClasses() throws Throwable {
+		Serde serde = new Serde();
+		serde.registerDefault();
+		serde.register(ru.snake.serde.parent.Data.class, true);
+		serde.register(ru.snake.serde.collection.Data.class, true);
+		serde.register(ru.snake.serde.array.Data.class, true);
+	}
+
 	@SafeVarargs
 	private <T> List<T> list(final T... items) {
 		return new ArrayList<>(Arrays.asList(items));
