@@ -31,7 +31,7 @@ public class SerdeTest {
 			"hello",
 			42
 		);
-		byte[] bytes = serde.serialize(source);
+		byte[] bytes = serde.serialize(source); // 32/14 bytes
 		ru.snake.serde.data.parent.Data target = serde.deserialize(bytes);
 
 		Assertions.assertEquals(source, target);
@@ -47,7 +47,7 @@ public class SerdeTest {
 			list("index", "name"),
 			new HashMap<>(Map.of(1, 0.75f, 2, 1.44f))
 		);
-		byte[] bytes = serde.serialize(source);
+		byte[] bytes = serde.serialize(source); // 77/32 bytes
 		ru.snake.serde.data.collection.Data target = serde.deserialize(bytes);
 
 		Assertions.assertEquals(source, target);
@@ -66,7 +66,7 @@ public class SerdeTest {
 			new List[] { list("a", "b"), list("cc", "dd") },
 			new List[] { list("eee"), list("fff") }
 		);
-		byte[] bytes = serde.serialize(source);
+		byte[] bytes = serde.serialize(source); // 189/63 bytes
 		ru.snake.serde.data.array.Data target = serde.deserialize(bytes);
 
 		Assertions.assertEquals(source, target);
@@ -82,7 +82,7 @@ public class SerdeTest {
 			DataType.TypeTwo,
 			new DataTag[] { DataTag.Right, DataTag.Middle }
 		);
-		byte[] bytes = serde.serialize(source);
+		byte[] bytes = serde.serialize(source); // 40/10 bytes
 		ru.snake.serde.data.enums.Data target = serde.deserialize(bytes);
 
 		Assertions.assertEquals(source, target);
@@ -104,7 +104,7 @@ public class SerdeTest {
 		}
 
 		ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-		ru.snake.serde.data.stream.Data targetA;
+		ru.snake.serde.data.stream.Data targetA; // 74/24 bytes
 		ru.snake.serde.data.stream.Data targetB;
 
 		try (DataInputStream stream = new DataInputStream(input)) {

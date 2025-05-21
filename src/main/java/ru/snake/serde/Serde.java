@@ -7,6 +7,8 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayDeque;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 import ru.snake.serde.context.SerdeContext;
 import ru.snake.serde.context.SerializerRegistry;
@@ -46,6 +49,8 @@ import ru.snake.serde.serializer.primitive.FloatSerailizer;
 import ru.snake.serde.serializer.primitive.IntegerSerailizer;
 import ru.snake.serde.serializer.primitive.LongSerailizer;
 import ru.snake.serde.serializer.primitive.ShortSerailizer;
+import ru.snake.serde.stream.CompactInputStream;
+import ru.snake.serde.stream.CompactOutputStream;
 
 public class Serde {
 
@@ -53,22 +58,42 @@ public class Serde {
 
 	private final SerializerRegistry serializerRegistry;
 
+	private Function<InputStream, DataInput> inputStream;
+
+	private Function<OutputStream, DataOutput> outputStream;
+
 	public Serde() {
 		this.typeRegistry = new TypeRegistry();
 		this.serializerRegistry = SerializerRegistry.create();
+		this.inputStream = DataInputStream::new;
+		this.outputStream = DataOutputStream::new;
+	}
+
+	public Serde compact(final boolean compactStream) {
+		if (compactStream) {
+			this.inputStream = CompactInputStream::new;
+			this.outputStream = CompactOutputStream::new;
+		} else {
+			this.inputStream = DataInputStream::new;
+			this.outputStream = DataOutputStream::new;
+		}
+
+		return this;
 	}
 
 	@SafeVarargs
-	private <T> void registerSerializer(final Serialiser<T> serializer, final Class<T>... classes)
+	private <T> Serde registerSerializer(final Serialiser<T> serializer, final Class<T>... classes)
 			throws SerdeException {
 		typeRegistry.registerAll(classes);
 
 		for (Class<T> clazz : classes) {
 			serializerRegistry.register(clazz, serializer);
 		}
+
+		return this;
 	}
 
-	public void registerDefault() throws SerdeException {
+	public Serde registerDefault() throws SerdeException {
 		// Trivial types.
 		registerSerializer(new ByteSerailizer(), byte.class, Byte.class);
 		registerSerializer(new ShortSerailizer(), short.class, Short.class);
@@ -98,26 +123,34 @@ public class Serde {
 		registerSerializer(new BooleanArraySerailizer(), boolean[].class);
 		registerSerializer(new CharacterArraySerailizer(), char[].class);
 		registerSerializer(new ObjectArraySerailizer(), Object[].class);
+
+		return this;
 	}
 
-	public <T> void register(final Class<T> clazz) throws SerdeException {
+	public <T> Serde register(final Class<T> clazz) throws SerdeException {
 		Serialiser<T> serialiser = Serialiser.builder(clazz).build();
 
 		typeRegistry.registerAll(clazz);
 		serializerRegistry.register(clazz, serialiser);
+
+		return this;
 	}
 
-	public <T> void register(final Class<T> clazz, final Serialiser<T> serialiser) throws SerdeException {
+	public <T> Serde register(final Class<T> clazz, final Serialiser<T> serialiser) throws SerdeException {
 		typeRegistry.registerAll(clazz);
 		serializerRegistry.register(clazz, serialiser);
+
+		return this;
 	}
 
-	public <T> void register(final Class<T> clazz, final boolean recursive) throws SerdeException {
+	public <T> Serde register(final Class<T> clazz, final boolean recursive) throws SerdeException {
 		if (recursive) {
 			registerRecursive(clazz);
 		} else {
 			register(clazz);
 		}
+
+		return this;
 	}
 
 	private <T> void registerRecursive(final Class<T> clazz) throws SerdeException {
@@ -207,8 +240,8 @@ public class Serde {
 	}
 
 	public <T> byte[] serialize(final T object) throws IOException, SerdeException {
-		try (ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-				DataOutputStream stream = new DataOutputStream(buffer)) {
+		try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+			DataOutput stream = outputStream.apply(buffer);
 			SerdeContext context = new SerdeContext(typeRegistry, serializerRegistry);
 			context.serialize(stream, object);
 
@@ -222,8 +255,8 @@ public class Serde {
 	}
 
 	public <T> T deserialize(final byte[] bytes) throws IOException, SerdeException {
-		try (ByteArrayInputStream buffer = new ByteArrayInputStream(bytes);
-				DataInputStream stream = new DataInputStream(buffer)) {
+		try (ByteArrayInputStream buffer = new ByteArrayInputStream(bytes)) {
+			DataInput stream = inputStream.apply(buffer);
 			SerdeContext context = new SerdeContext(typeRegistry, serializerRegistry);
 
 			return context.deserialize(stream);
