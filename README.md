@@ -21,6 +21,7 @@ Create a `Serde` instance and register default serializers:
 Serde serde = new Serde();
 serde.registerDefault(); // Registers primitives, wrappers, strings, and arrays
 serde.compact(true); // For serializing in compact format
+serde.references(true); // For tracking object references
 ```
 
 ### 2. Register Custom Classes
