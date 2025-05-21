@@ -175,12 +175,12 @@ public class SerdeTest {
 	}
 
 	@SafeVarargs
-	private <T> Set<T> set(final T... items) {
+	private final <T> Set<T> set(final T... items) {
 		return new HashSet<>(Arrays.asList(items));
 	}
 
 	@SafeVarargs
-	private <T> List<T> list(final T... items) {
+	private final <T> List<T> list(final T... items) {
 		return new ArrayList<>(Arrays.asList(items));
 	}
 
