@@ -23,6 +23,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 
+import ru.snake.serde.context.ContextBuilder;
+import ru.snake.serde.context.FlatSerdeContext;
+import ru.snake.serde.context.ReferenceSerdeContext;
 import ru.snake.serde.context.SerdeContext;
 import ru.snake.serde.context.SerializerRegistry;
 import ru.snake.serde.context.TypeRegistry;
@@ -62,20 +65,33 @@ public class Serde {
 
 	private Function<OutputStream, DataOutput> outputStream;
 
+	private ContextBuilder contextBuilder;
+
 	public Serde() {
 		this.typeRegistry = new TypeRegistry();
 		this.serializerRegistry = SerializerRegistry.create();
 		this.inputStream = DataInputStream::new;
 		this.outputStream = DataOutputStream::new;
+		this.contextBuilder = FlatSerdeContext::new;
 	}
 
-	public Serde compact(final boolean compactStream) {
-		if (compactStream) {
-			this.inputStream = CompactInputStream::new;
-			this.outputStream = CompactOutputStream::new;
+	public Serde compact(final boolean enable) {
+		if (enable) {
+			inputStream = CompactInputStream::new;
+			outputStream = CompactOutputStream::new;
 		} else {
-			this.inputStream = DataInputStream::new;
-			this.outputStream = DataOutputStream::new;
+			inputStream = DataInputStream::new;
+			outputStream = DataOutputStream::new;
+		}
+
+		return this;
+	}
+
+	public Serde references(boolean enable) {
+		if (enable) {
+			contextBuilder = ReferenceSerdeContext::new;
+		} else {
+			contextBuilder = FlatSerdeContext::new;
 		}
 
 		return this;
@@ -242,36 +258,37 @@ public class Serde {
 	public <T> byte[] serialize(final T object) throws IOException, SerdeException {
 		try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
 			DataOutput stream = outputStream.apply(buffer);
-			SerdeContext context = new SerdeContext(typeRegistry, serializerRegistry);
+			SerdeContext context = contextBuilder.create(typeRegistry, serializerRegistry);
 			context.serialize(stream, object);
 
 			return buffer.toByteArray();
 		}
 	}
 
-	public <T> void serialize(final DataOutput stream, final T object) throws IOException, SerdeException {
-		SerdeContext context = new SerdeContext(typeRegistry, serializerRegistry);
-		context.serialize(stream, object);
-	}
-
 	public <T> T deserialize(final byte[] bytes) throws IOException, SerdeException {
 		try (ByteArrayInputStream buffer = new ByteArrayInputStream(bytes)) {
 			DataInput stream = inputStream.apply(buffer);
-			SerdeContext context = new SerdeContext(typeRegistry, serializerRegistry);
+			SerdeContext context = contextBuilder.create(typeRegistry, serializerRegistry);
 
 			return context.deserialize(stream);
 		}
 	}
 
+	public <T> void serialize(final DataOutput stream, final T object) throws IOException, SerdeException {
+		SerdeContext context = contextBuilder.create(typeRegistry, serializerRegistry);
+		context.serialize(stream, object);
+	}
+
 	public <T> T deserialize(final DataInput stream) throws IOException, SerdeException {
-		SerdeContext context = new SerdeContext(typeRegistry, serializerRegistry);
+		SerdeContext context = contextBuilder.create(typeRegistry, serializerRegistry);
 
 		return context.deserialize(stream);
 	}
 
 	@Override
 	public String toString() {
-		return "Serde [typeRegistry=" + typeRegistry + ", serializerRegistry=" + serializerRegistry + "]";
+		return "Serde [typeRegistry=" + typeRegistry + ", serializerRegistry=" + serializerRegistry + ", inputStream="
+				+ inputStream + ", outputStream=" + outputStream + ", contextBuilder=" + contextBuilder + "]";
 	}
 
 }

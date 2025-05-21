@@ -35,6 +35,7 @@ public class MapSerailizer<T extends Map<Object, Object>> extends Serialiser<T> 
 	public T deserialize(final SerdeContext context, final DataInput stream) throws IOException, SerdeException {
 		int length = stream.readInt();
 		T result = constructor.get();
+		context.addObject(result);
 
 		for (int index = 0; index < length; index += 1) {
 			Object key = context.deserialize(stream);

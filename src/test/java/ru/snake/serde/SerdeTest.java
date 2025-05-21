@@ -130,6 +130,39 @@ public class SerdeTest {
 	}
 
 	@Test
+	public void mustSerializeCyclycReferences() throws Throwable {
+		Serde serde = new Serde();
+		serde.registerDefault();
+		serde.register(ru.snake.serde.data.cycle.Data.class, true);
+		serde.references(true);
+
+		ru.snake.serde.data.cycle.Data source = new ru.snake.serde.data.cycle.Data(10, null);
+		source.setNext(source);
+		byte[] bytes = serde.serialize(source); // 16/4 bytes
+		ru.snake.serde.data.cycle.Data target = serde.deserialize(bytes);
+
+		Assertions.assertEquals(source, target);
+		Assertions.assertSame(target, target.getNext());
+	}
+
+	@Test
+	public void mustSerializeObjectReferences() throws Throwable {
+		Serde serde = new Serde();
+		serde.registerDefault();
+		serde.register(ru.snake.serde.data.object.Data.class, true);
+		serde.references(true);
+
+		String first = "first";
+		String second = "second";
+		List<String> couple = list(first, second);
+		ru.snake.serde.data.object.Data source = new ru.snake.serde.data.object.Data(10, couple, list(couple, couple));
+		byte[] bytes = serde.serialize(source); // 67/25 bytes
+		ru.snake.serde.data.object.Data target = serde.deserialize(bytes);
+
+		Assertions.assertEquals(source, target);
+	}
+
+	@Test
 	public void mustRegisterManyClasses() throws Throwable {
 		Serde serde = new Serde();
 		serde.registerDefault();

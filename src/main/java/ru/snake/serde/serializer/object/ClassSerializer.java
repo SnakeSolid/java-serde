@@ -32,6 +32,7 @@ public class ClassSerializer<T> extends Serialiser<T> {
 	@Override
 	public T deserialize(final SerdeContext context, DataInput stream) throws IOException, SerdeException {
 		T object = constructor.create();
+		context.addObject(object);
 
 		for (ProterySerializer property : properties) {
 			property.deserialize(context, stream, object);

@@ -16,7 +16,6 @@ public class ObjectArraySerailizer extends Serialiser<Object[]> {
 			throws IOException, SerdeException {
 		Class<?> arrayClass = array.getClass().getComponentType();
 		context.serializeType(stream, arrayClass);
-
 		stream.writeInt(array.length);
 
 		for (Object item : array) {
@@ -29,6 +28,7 @@ public class ObjectArraySerailizer extends Serialiser<Object[]> {
 		Class<?> clazz = context.deserializeType(stream);
 		int length = stream.readInt();
 		Object[] result = (Object[]) Array.newInstance(clazz, length);
+		context.addObject(result);
 
 		for (int index = 0; index < length; index += 1) {
 			Object item = context.deserialize(stream);

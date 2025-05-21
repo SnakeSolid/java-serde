@@ -33,6 +33,7 @@ public class CollectionSerailizer<T extends Collection<Object>> extends Serialis
 	public T deserialize(final SerdeContext context, final DataInput stream) throws IOException, SerdeException {
 		int length = stream.readInt();
 		T result = constructor.get();
+		context.addObject(result);
 
 		for (int index = 0; index < length; index += 1) {
 			Object item = context.deserialize(stream);
