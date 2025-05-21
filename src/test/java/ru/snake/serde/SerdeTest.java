@@ -15,8 +15,8 @@ import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import ru.snake.serde.enums.DataTag;
-import ru.snake.serde.enums.DataType;
+import ru.snake.serde.data.enums.DataTag;
+import ru.snake.serde.data.enums.DataType;
 
 public class SerdeTest {
 
@@ -24,15 +24,15 @@ public class SerdeTest {
 	public void mustSerializeParentClassFields() throws Throwable {
 		Serde serde = new Serde();
 		serde.registerDefault();
-		serde.register(ru.snake.serde.parent.Data.class);
+		serde.register(ru.snake.serde.data.parent.Data.class);
 
-		ru.snake.serde.parent.Data source = new ru.snake.serde.parent.Data(
+		ru.snake.serde.data.parent.Data source = new ru.snake.serde.data.parent.Data(
 			new boolean[] { false, true, false },
 			"hello",
 			42
 		);
 		byte[] bytes = serde.serialize(source);
-		ru.snake.serde.parent.Data target = serde.deserialize(bytes);
+		ru.snake.serde.data.parent.Data target = serde.deserialize(bytes);
 
 		Assertions.assertEquals(source, target);
 	}
@@ -41,14 +41,14 @@ public class SerdeTest {
 	public void mustSerializeBasicCollections() throws Throwable {
 		Serde serde = new Serde();
 		serde.registerDefault();
-		serde.register(ru.snake.serde.collection.Data.class);
+		serde.register(ru.snake.serde.data.collection.Data.class);
 
-		ru.snake.serde.collection.Data source = new ru.snake.serde.collection.Data(
+		ru.snake.serde.data.collection.Data source = new ru.snake.serde.data.collection.Data(
 			list("index", "name"),
 			new HashMap<>(Map.of(1, 0.75f, 2, 1.44f))
 		);
 		byte[] bytes = serde.serialize(source);
-		ru.snake.serde.collection.Data target = serde.deserialize(bytes);
+		ru.snake.serde.data.collection.Data target = serde.deserialize(bytes);
 
 		Assertions.assertEquals(source, target);
 	}
@@ -57,17 +57,17 @@ public class SerdeTest {
 	public void mustSerializeObjectArrays() throws Throwable {
 		Serde serde = new Serde();
 		serde.registerDefault();
-		serde.register(ru.snake.serde.array.Data.class, true);
+		serde.register(ru.snake.serde.data.array.Data.class, true);
 
 		@SuppressWarnings("unchecked")
-		ru.snake.serde.array.Data source = new ru.snake.serde.array.Data(
+		ru.snake.serde.data.array.Data source = new ru.snake.serde.data.array.Data(
 			new long[] { 100, 200, 300 },
 			new String[] { "index", "name" },
 			new List[] { list("a", "b"), list("cc", "dd") },
 			new List[] { list("eee"), list("fff") }
 		);
 		byte[] bytes = serde.serialize(source);
-		ru.snake.serde.array.Data target = serde.deserialize(bytes);
+		ru.snake.serde.data.array.Data target = serde.deserialize(bytes);
 
 		Assertions.assertEquals(source, target);
 	}
@@ -76,14 +76,14 @@ public class SerdeTest {
 	public void mustSerializeEnums() throws Throwable {
 		Serde serde = new Serde();
 		serde.registerDefault();
-		serde.register(ru.snake.serde.enums.Data.class, true);
+		serde.register(ru.snake.serde.data.enums.Data.class, true);
 
-		ru.snake.serde.enums.Data source = new ru.snake.serde.enums.Data(
+		ru.snake.serde.data.enums.Data source = new ru.snake.serde.data.enums.Data(
 			DataType.TypeTwo,
 			new DataTag[] { DataTag.Right, DataTag.Middle }
 		);
 		byte[] bytes = serde.serialize(source);
-		ru.snake.serde.enums.Data target = serde.deserialize(bytes);
+		ru.snake.serde.data.enums.Data target = serde.deserialize(bytes);
 
 		Assertions.assertEquals(source, target);
 	}
@@ -92,11 +92,11 @@ public class SerdeTest {
 	public void mustSerilizeToStream() throws Throwable {
 		Serde serde = new Serde();
 		serde.registerDefault();
-		serde.register(ru.snake.serde.stream.Data.class, true);
+		serde.register(ru.snake.serde.data.stream.Data.class, true);
 
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		ru.snake.serde.stream.Data sourceA = new ru.snake.serde.stream.Data(false, (short) 5, set("a", "b"));
-		ru.snake.serde.stream.Data sourceB = new ru.snake.serde.stream.Data(true, (short) 42, set("c", "d"));
+		ru.snake.serde.data.stream.Data sourceA = new ru.snake.serde.data.stream.Data(false, (short) 5, set("a", "b"));
+		ru.snake.serde.data.stream.Data sourceB = new ru.snake.serde.data.stream.Data(true, (short) 42, set("c", "d"));
 
 		try (DataOutputStream stream = new DataOutputStream(output)) {
 			serde.serialize(stream, sourceA);
@@ -104,8 +104,8 @@ public class SerdeTest {
 		}
 
 		ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-		ru.snake.serde.stream.Data targetA;
-		ru.snake.serde.stream.Data targetB;
+		ru.snake.serde.data.stream.Data targetA;
+		ru.snake.serde.data.stream.Data targetB;
 
 		try (DataInputStream stream = new DataInputStream(input)) {
 			targetA = serde.deserialize(stream);
@@ -120,11 +120,11 @@ public class SerdeTest {
 	public void mustRegisterManyClasses() throws Throwable {
 		Serde serde = new Serde();
 		serde.registerDefault();
-		serde.register(ru.snake.serde.array.Data.class, true);
-		serde.register(ru.snake.serde.collection.Data.class, true);
-		serde.register(ru.snake.serde.enums.Data.class, true);
-		serde.register(ru.snake.serde.parent.Data.class, true);
-		serde.register(ru.snake.serde.stream.Data.class, true);
+		serde.register(ru.snake.serde.data.array.Data.class, true);
+		serde.register(ru.snake.serde.data.collection.Data.class, true);
+		serde.register(ru.snake.serde.data.enums.Data.class, true);
+		serde.register(ru.snake.serde.data.parent.Data.class, true);
+		serde.register(ru.snake.serde.data.stream.Data.class, true);
 	}
 
 	@SafeVarargs

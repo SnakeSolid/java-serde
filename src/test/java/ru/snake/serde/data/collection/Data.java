@@ -1,4 +1,4 @@
-package ru.snake.serde.collection;
+package ru.snake.serde.data.collection;
 
 import java.util.List;
 import java.util.Map;

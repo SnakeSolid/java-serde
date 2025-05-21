@@ -2,7 +2,9 @@ package ru.snake.serde;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
 import java.io.DataInputStream;
+import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -214,7 +216,7 @@ public class Serde {
 		}
 	}
 
-	public <T> void serialize(final DataOutputStream stream, final T object) throws IOException, SerdeException {
+	public <T> void serialize(final DataOutput stream, final T object) throws IOException, SerdeException {
 		SerdeContext context = new SerdeContext(typeRegistry, serializerRegistry);
 		context.serialize(stream, object);
 	}
@@ -228,7 +230,7 @@ public class Serde {
 		}
 	}
 
-	public <T> T deserialize(final DataInputStream stream) throws IOException, SerdeException {
+	public <T> T deserialize(final DataInput stream) throws IOException, SerdeException {
 		SerdeContext context = new SerdeContext(typeRegistry, serializerRegistry);
 
 		return context.deserialize(stream);

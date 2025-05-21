@@ -1,4 +1,4 @@
-package ru.snake.serde.parent;
+package ru.snake.serde.data.parent;
 
 public class DataParent {
 

@@ -1,4 +1,4 @@
-package ru.snake.serde.stream;
+package ru.snake.serde.data.stream;
 
 import java.util.Objects;
 import java.util.Set;

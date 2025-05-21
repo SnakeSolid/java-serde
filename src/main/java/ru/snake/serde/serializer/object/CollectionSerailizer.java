@@ -1,7 +1,7 @@
 package ru.snake.serde.serializer.object;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.function.Supplier;
@@ -19,7 +19,7 @@ public class CollectionSerailizer<T extends Collection<Object>> extends Serialis
 	}
 
 	@Override
-	public void serialize(final SerdeContext context, final DataOutputStream stream, final T collection)
+	public void serialize(final SerdeContext context, final DataOutput stream, final T collection)
 			throws IOException, SerdeException {
 		int length = collection.size();
 		stream.writeInt(length);
@@ -30,7 +30,7 @@ public class CollectionSerailizer<T extends Collection<Object>> extends Serialis
 	}
 
 	@Override
-	public T deserialize(final SerdeContext context, final DataInputStream stream) throws IOException, SerdeException {
+	public T deserialize(final SerdeContext context, final DataInput stream) throws IOException, SerdeException {
 		int length = stream.readInt();
 		T result = constructor.get();
 

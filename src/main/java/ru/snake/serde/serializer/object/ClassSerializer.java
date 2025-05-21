@@ -1,7 +1,7 @@
 package ru.snake.serde.serializer.object;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
 
@@ -23,15 +23,14 @@ public class ClassSerializer<T> extends Serialiser<T> {
 	}
 
 	@Override
-	public void serialize(final SerdeContext context, DataOutputStream stream, T object)
-			throws IOException, SerdeException {
+	public void serialize(final SerdeContext context, DataOutput stream, T object) throws IOException, SerdeException {
 		for (ProterySerializer property : properties) {
 			property.serialize(context, stream, object);
 		}
 	}
 
 	@Override
-	public T deserialize(final SerdeContext context, DataInputStream stream) throws IOException, SerdeException {
+	public T deserialize(final SerdeContext context, DataInput stream) throws IOException, SerdeException {
 		T object = constructor.create();
 
 		for (ProterySerializer property : properties) {

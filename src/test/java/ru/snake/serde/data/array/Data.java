@@ -1,4 +1,4 @@
-package ru.snake.serde.array;
+package ru.snake.serde.data.array;
 
 import java.util.Arrays;
 import java.util.List;

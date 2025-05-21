@@ -1,7 +1,7 @@
 package ru.snake.serde.serializer.object;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import ru.snake.serde.context.SerdeContext;
@@ -10,8 +10,7 @@ import ru.snake.serde.serializer.Serialiser;
 public class StringSerailizer extends Serialiser<String> {
 
 	@Override
-	public void serialize(final SerdeContext context, final DataOutputStream stream, final String object)
-			throws IOException {
+	public void serialize(final SerdeContext context, final DataOutput stream, final String object) throws IOException {
 		byte[] bytes = object.getBytes();
 
 		stream.writeInt(bytes.length);
@@ -19,11 +18,12 @@ public class StringSerailizer extends Serialiser<String> {
 	}
 
 	@Override
-	public String deserialize(final SerdeContext context, final DataInputStream stream) throws IOException {
+	public String deserialize(final SerdeContext context, final DataInput stream) throws IOException {
 		int length = stream.readInt();
-		byte[] bytes = stream.readNBytes(length);
+		byte[] buffer = new byte[length];
+		stream.readFully(buffer);
 
-		return new String(bytes);
+		return new String(buffer);
 	}
 
 	@Override

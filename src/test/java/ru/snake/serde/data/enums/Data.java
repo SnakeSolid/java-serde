@@ -1,4 +1,4 @@
-package ru.snake.serde.enums;
+package ru.snake.serde.data.enums;
 
 import java.util.Arrays;
 import java.util.Objects;
