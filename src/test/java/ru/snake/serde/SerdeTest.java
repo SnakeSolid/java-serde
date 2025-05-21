@@ -24,14 +24,20 @@ public class SerdeTest {
 	public void mustSerializeParentClassFields() throws Throwable {
 		Serde serde = new Serde();
 		serde.registerDefault();
-		serde.register(ru.snake.serde.data.parent.Data.class);
+		serde.register(ru.snake.serde.data.parent.Data.class).compact(true);
 
 		ru.snake.serde.data.parent.Data source = new ru.snake.serde.data.parent.Data(
-			new boolean[] { false, true, false },
 			"hello",
-			42
+			true,
+			(byte) 42,
+			(short) 42,
+			42,
+			42L,
+			42.0f,
+			42.0,
+			'a'
 		);
-		byte[] bytes = serde.serialize(source); // 32/14 bytes
+		byte[] bytes = serde.serialize(source); // 47/26 bytes
 		ru.snake.serde.data.parent.Data target = serde.deserialize(bytes);
 
 		Assertions.assertEquals(source, target);
@@ -61,12 +67,19 @@ public class SerdeTest {
 
 		@SuppressWarnings("unchecked")
 		ru.snake.serde.data.array.Data source = new ru.snake.serde.data.array.Data(
-			new long[] { 100, 200, 300 },
+			new boolean[] { true, false },
+			new byte[] { 10, 20, 30 },
+			new short[] { 10, 20, 30 },
+			new int[] { 10, 20, 30 },
+			new long[] { 10, 20, 30 },
+			new float[] { 10, 20, 30 },
+			new double[] { 10, 20, 30 },
+			new char[] { 'a', 'b', 'c' },
 			new String[] { "index", "name" },
 			new List[] { list("a", "b"), list("cc", "dd") },
 			new List[] { list("eee"), list("fff") }
 		);
-		byte[] bytes = serde.serialize(source); // 189/63 bytes
+		byte[] bytes = serde.serialize(source); // 310/124 bytes
 		ru.snake.serde.data.array.Data target = serde.deserialize(bytes);
 
 		Assertions.assertEquals(source, target);
