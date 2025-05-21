@@ -9,7 +9,7 @@ A lightweight library for converting Java objects to byte streams and reconstruc
 - [x] **Strings**: Built-in support for `String` serialization.
 - [x] **Custom Objects**: Serialize/deserialize custom classes by registering them. Handles inheritance and private fields.
 - [x] **Compact Representation**: Support serialization in compact and full format.
-- [ ] **Cyclic References**: Support objects with cyclic and self references.
+- [x] **Cyclic References**: Support objects with cyclic and self references.
 
 ## Usage
 
