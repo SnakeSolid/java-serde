@@ -169,6 +169,7 @@ public class SerdeTest {
 		serde.register(ru.snake.serde.data.array.Data.class, true);
 		serde.register(ru.snake.serde.data.collection.Data.class, true);
 		serde.register(ru.snake.serde.data.enums.Data.class, true);
+		serde.register(ru.snake.serde.data.object.Data.class, true);
 		serde.register(ru.snake.serde.data.parent.Data.class, true);
 		serde.register(ru.snake.serde.data.stream.Data.class, true);
 	}

@@ -1,19 +1,21 @@
-package ru.snake.serde.context;
+package ru.snake.serde.context.flat;
 
-import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import ru.snake.serde.context.SerializeContext;
+import ru.snake.serde.context.SerializerRegistry;
+import ru.snake.serde.context.TypeRegistry;
 import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.exception.SerdeException;
 
-public class FlatSerdeContext implements SerdeContext {
+public class FlatSerializeContext implements SerializeContext {
 
 	private final TypeRegistry typeRegistry;
 
 	private final SerializerRegistry serializerRegistry;
 
-	public FlatSerdeContext(final TypeRegistry typeRegistry, final SerializerRegistry serializerRegistry) {
+	public FlatSerializeContext(final TypeRegistry typeRegistry, final SerializerRegistry serializerRegistry) {
 		this.typeRegistry = typeRegistry;
 		this.serializerRegistry = serializerRegistry;
 	}
@@ -30,14 +32,6 @@ public class FlatSerdeContext implements SerdeContext {
 		Serialiser<T> serializer = serializerRegistry.getSerializer(clazz);
 
 		serializer.serialize(this, stream, object);
-	}
-
-	@Override
-	public <T> T deserializePrimitive(DataInput stream, Class<T> clazz) throws IOException, SerdeException {
-		Serialiser<T> serializer = serializerRegistry.getSerializer(clazz);
-		T result = serializer.deserialize(this, stream);
-
-		return result;
 	}
 
 	@Override
@@ -59,21 +53,6 @@ public class FlatSerdeContext implements SerdeContext {
 	}
 
 	@Override
-	public <T> T deserialize(DataInput stream) throws IOException, SerdeException {
-		int id = stream.readInt();
-
-		if (id == typeRegistry.getNullId()) {
-			return null;
-		}
-
-		Class<T> clazz = typeRegistry.getClass(id);
-		Serialiser<T> serializer = serializerRegistry.getSerializer(clazz);
-		T result = serializer.deserialize(this, stream);
-
-		return result;
-	}
-
-	@Override
 	public <T> void serializeType(final DataOutput stream, final Class<T> clazz) throws IOException, SerdeException {
 		int id = typeRegistry.getId(clazz);
 
@@ -81,16 +60,9 @@ public class FlatSerdeContext implements SerdeContext {
 	}
 
 	@Override
-	public <T> Class<T> deserializeType(DataInput stream) throws IOException, SerdeException {
-		int id = stream.readInt();
-		Class<T> clazz = typeRegistry.getClass(id);
-
-		return clazz;
-	}
-
-	@Override
 	public String toString() {
-		return "SerdeContext [typeRegistry=" + typeRegistry + ", serializerRegistry=" + serializerRegistry + "]";
+		return "FlatSerializeContext [typeRegistry=" + typeRegistry + ", serializerRegistry=" + serializerRegistry
+				+ "]";
 	}
 
 }

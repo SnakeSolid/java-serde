@@ -5,14 +5,15 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.reflect.Array;
 
-import ru.snake.serde.context.SerdeContext;
+import ru.snake.serde.context.DeserializeContext;
+import ru.snake.serde.context.SerializeContext;
 import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.exception.SerdeException;
 
 public class ObjectArraySerailizer extends Serialiser<Object[]> {
 
 	@Override
-	public void serialize(final SerdeContext context, final DataOutput stream, final Object[] array)
+	public void serialize(final SerializeContext context, final DataOutput stream, final Object[] array)
 			throws IOException, SerdeException {
 		Class<?> arrayClass = array.getClass().getComponentType();
 		context.serializeType(stream, arrayClass);
@@ -24,7 +25,8 @@ public class ObjectArraySerailizer extends Serialiser<Object[]> {
 	}
 
 	@Override
-	public Object[] deserialize(final SerdeContext context, final DataInput stream) throws IOException, SerdeException {
+	public Object[] deserialize(final DeserializeContext context, final DataInput stream)
+			throws IOException, SerdeException {
 		Class<?> clazz = context.deserializeType(stream);
 		int length = stream.readInt();
 		Object[] result = (Object[]) Array.newInstance(clazz, length);

@@ -4,13 +4,15 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import ru.snake.serde.context.SerdeContext;
+import ru.snake.serde.context.DeserializeContext;
+import ru.snake.serde.context.SerializeContext;
 import ru.snake.serde.serializer.Serialiser;
 
 public class CharacterArraySerailizer extends Serialiser<char[]> {
 
 	@Override
-	public void serialize(final SerdeContext context, final DataOutput stream, final char[] object) throws IOException {
+	public void serialize(final SerializeContext context, final DataOutput stream, final char[] object)
+			throws IOException {
 		stream.writeInt(object.length);
 
 		for (int index = 0; index < object.length; index += 1) {
@@ -19,7 +21,7 @@ public class CharacterArraySerailizer extends Serialiser<char[]> {
 	}
 
 	@Override
-	public char[] deserialize(final SerdeContext context, final DataInput stream) throws IOException {
+	public char[] deserialize(final DeserializeContext context, final DataInput stream) throws IOException {
 		int length = stream.readInt();
 		char[] result = new char[length];
 

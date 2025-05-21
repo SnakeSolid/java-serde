@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
-import ru.snake.serde.context.SerdeContext;
+import ru.snake.serde.context.DeserializeContext;
+import ru.snake.serde.context.SerializeContext;
 import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.exception.SerdeException;
 
@@ -20,7 +21,7 @@ public class MapSerailizer<T extends Map<Object, Object>> extends Serialiser<T> 
 	}
 
 	@Override
-	public void serialize(final SerdeContext context, final DataOutput stream, final T collection)
+	public void serialize(final SerializeContext context, final DataOutput stream, final T collection)
 			throws IOException, SerdeException {
 		int length = collection.size();
 		stream.writeInt(length);
@@ -32,7 +33,7 @@ public class MapSerailizer<T extends Map<Object, Object>> extends Serialiser<T> 
 	}
 
 	@Override
-	public T deserialize(final SerdeContext context, final DataInput stream) throws IOException, SerdeException {
+	public T deserialize(final DeserializeContext context, final DataInput stream) throws IOException, SerdeException {
 		int length = stream.readInt();
 		T result = constructor.get();
 		context.addObject(result);

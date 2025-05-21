@@ -1,16 +1,17 @@
-package ru.snake.serde.context;
+package ru.snake.serde.context.reference;
 
-import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+import ru.snake.serde.context.SerializeContext;
+import ru.snake.serde.context.SerializerRegistry;
+import ru.snake.serde.context.TypeRegistry;
 import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.exception.SerdeException;
 
-public class ReferenceSerdeContext implements SerdeContext {
+public class ReferenceSerializeContext implements SerializeContext {
 
 	private static final int START_REFERENCE_ID = 1;
 
@@ -20,15 +21,12 @@ public class ReferenceSerdeContext implements SerdeContext {
 
 	private final Map<Object, Integer> objectReferences;
 
-	private final Map<Integer, Object> referenceObjects;
-
 	private int nextReference;
 
-	public ReferenceSerdeContext(final TypeRegistry typeRegistry, final SerializerRegistry serializerRegistry) {
+	public ReferenceSerializeContext(final TypeRegistry typeRegistry, final SerializerRegistry serializerRegistry) {
 		this.typeRegistry = typeRegistry;
 		this.serializerRegistry = serializerRegistry;
 		this.objectReferences = new IdentityHashMap<>();
-		this.referenceObjects = new HashMap<>();
 		this.nextReference = START_REFERENCE_ID;
 	}
 
@@ -39,7 +37,6 @@ public class ReferenceSerdeContext implements SerdeContext {
 		if (nextId == null) {
 			nextId = nextReference;
 			objectReferences.put(object, nextId);
-			referenceObjects.put(nextId, object);
 			nextReference += 1;
 		}
 
@@ -53,14 +50,6 @@ public class ReferenceSerdeContext implements SerdeContext {
 		Serialiser<T> serializer = serializerRegistry.getSerializer(clazz);
 
 		serializer.serialize(this, stream, object);
-	}
-
-	@Override
-	public <T> T deserializePrimitive(DataInput stream, Class<T> clazz) throws IOException, SerdeException {
-		Serialiser<T> serializer = serializerRegistry.getSerializer(clazz);
-		T result = serializer.deserialize(this, stream);
-
-		return result;
 	}
 
 	@Override
@@ -92,29 +81,6 @@ public class ReferenceSerdeContext implements SerdeContext {
 	}
 
 	@Override
-	public <T> T deserialize(DataInput stream) throws IOException, SerdeException {
-		int id = stream.readInt();
-
-		if (id == typeRegistry.getNullId()) {
-			return null;
-		} else if (id == typeRegistry.getReferenceId()) {
-			int referenceId = stream.readInt();
-			@SuppressWarnings("unchecked")
-			T result = (T) referenceObjects.get(referenceId);
-
-			return result;
-		}
-
-		Class<T> clazz = typeRegistry.getClass(id);
-		Serialiser<T> serializer = serializerRegistry.getSerializer(clazz);
-		T result = serializer.deserialize(this, stream);
-
-		addObject(result);
-
-		return result;
-	}
-
-	@Override
 	public <T> void serializeType(final DataOutput stream, final Class<T> clazz) throws IOException, SerdeException {
 		int id = typeRegistry.getId(clazz);
 
@@ -122,16 +88,9 @@ public class ReferenceSerdeContext implements SerdeContext {
 	}
 
 	@Override
-	public <T> Class<T> deserializeType(DataInput stream) throws IOException, SerdeException {
-		int id = stream.readInt();
-		Class<T> clazz = typeRegistry.getClass(id);
-
-		return clazz;
-	}
-
-	@Override
 	public String toString() {
-		return "SerdeContext [typeRegistry=" + typeRegistry + ", serializerRegistry=" + serializerRegistry + "]";
+		return "ReferenceSerializeContext [typeRegistry=" + typeRegistry + ", serializerRegistry=" + serializerRegistry
+				+ ", objectReferences=" + objectReferences + ", nextReference=" + nextReference + "]";
 	}
 
 }

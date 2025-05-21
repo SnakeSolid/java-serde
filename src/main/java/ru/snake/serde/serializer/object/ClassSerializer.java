@@ -5,7 +5,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
 
-import ru.snake.serde.context.SerdeContext;
+import ru.snake.serde.context.DeserializeContext;
+import ru.snake.serde.context.SerializeContext;
 import ru.snake.serde.serializer.SerdeConstructor;
 import ru.snake.serde.serializer.Serialiser;
 import ru.snake.serde.serializer.exception.SerdeException;
@@ -23,14 +24,15 @@ public class ClassSerializer<T> extends Serialiser<T> {
 	}
 
 	@Override
-	public void serialize(final SerdeContext context, DataOutput stream, T object) throws IOException, SerdeException {
+	public void serialize(final SerializeContext context, DataOutput stream, T object)
+			throws IOException, SerdeException {
 		for (ProterySerializer property : properties) {
 			property.serialize(context, stream, object);
 		}
 	}
 
 	@Override
-	public T deserialize(final SerdeContext context, DataInput stream) throws IOException, SerdeException {
+	public T deserialize(final DeserializeContext context, DataInput stream) throws IOException, SerdeException {
 		T object = constructor.create();
 		context.addObject(object);
 
