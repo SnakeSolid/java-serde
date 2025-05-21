@@ -7,8 +7,6 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayDeque;
@@ -21,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.function.Function;
 
 import ru.snake.serde.context.ContextBuilder;
 import ru.snake.serde.context.FlatSerdeContext;
@@ -54,34 +51,48 @@ import ru.snake.serde.serializer.primitive.LongSerailizer;
 import ru.snake.serde.serializer.primitive.ShortSerailizer;
 import ru.snake.serde.stream.CompactInputStream;
 import ru.snake.serde.stream.CompactOutputStream;
+import ru.snake.serde.stream.DataInputBuilder;
+import ru.snake.serde.stream.DataOutputBuilder;
 
 public class Serde {
+
+	private static final DataInputBuilder COMPACT_INPUT_STREAM = CompactInputStream::new;
+
+	private static final DataOutputBuilder COMPACT_OUTPUT_STREAM = CompactOutputStream::new;
+
+	private static final DataInputBuilder DATA_INPUT_STREAM = DataInputStream::new;
+
+	private static final DataOutputBuilder DATA_OUTPUT_STREAM = DataOutputStream::new;
+
+	private static final ContextBuilder FLAT_CONTEXT = FlatSerdeContext::new;
+
+	private static final ContextBuilder REFERENCE_CONTEXT = ReferenceSerdeContext::new;
 
 	private final TypeRegistry typeRegistry;
 
 	private final SerializerRegistry serializerRegistry;
 
-	private Function<InputStream, DataInput> inputStream;
+	private DataInputBuilder inputStream;
 
-	private Function<OutputStream, DataOutput> outputStream;
+	private DataOutputBuilder outputStream;
 
 	private ContextBuilder contextBuilder;
 
 	public Serde() {
 		this.typeRegistry = new TypeRegistry();
 		this.serializerRegistry = SerializerRegistry.create();
-		this.inputStream = DataInputStream::new;
-		this.outputStream = DataOutputStream::new;
-		this.contextBuilder = FlatSerdeContext::new;
+		this.inputStream = DATA_INPUT_STREAM;
+		this.outputStream = DATA_OUTPUT_STREAM;
+		this.contextBuilder = FLAT_CONTEXT;
 	}
 
 	public Serde compact(final boolean enable) {
 		if (enable) {
-			inputStream = CompactInputStream::new;
-			outputStream = CompactOutputStream::new;
+			inputStream = COMPACT_INPUT_STREAM;
+			outputStream = COMPACT_OUTPUT_STREAM;
 		} else {
-			inputStream = DataInputStream::new;
-			outputStream = DataOutputStream::new;
+			inputStream = DATA_INPUT_STREAM;
+			outputStream = DATA_OUTPUT_STREAM;
 		}
 
 		return this;
@@ -89,9 +100,9 @@ public class Serde {
 
 	public Serde references(boolean enable) {
 		if (enable) {
-			contextBuilder = ReferenceSerdeContext::new;
+			contextBuilder = REFERENCE_CONTEXT;
 		} else {
-			contextBuilder = FlatSerdeContext::new;
+			contextBuilder = FLAT_CONTEXT;
 		}
 
 		return this;
@@ -257,7 +268,7 @@ public class Serde {
 
 	public <T> byte[] serialize(final T object) throws IOException, SerdeException {
 		try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-			DataOutput stream = outputStream.apply(buffer);
+			DataOutput stream = outputStream.create(buffer);
 			SerdeContext context = contextBuilder.create(typeRegistry, serializerRegistry);
 			context.serialize(stream, object);
 
@@ -267,7 +278,7 @@ public class Serde {
 
 	public <T> T deserialize(final byte[] bytes) throws IOException, SerdeException {
 		try (ByteArrayInputStream buffer = new ByteArrayInputStream(bytes)) {
-			DataInput stream = inputStream.apply(buffer);
+			DataInput stream = inputStream.create(buffer);
 			SerdeContext context = contextBuilder.create(typeRegistry, serializerRegistry);
 
 			return context.deserialize(stream);
